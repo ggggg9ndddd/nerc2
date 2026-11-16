@@ -30,6 +30,7 @@
   .seg input:checked + label{background:var(--navy);color:#fff}
   .seg input:focus-visible + label{outline:3px solid var(--lav);outline-offset:-3px}
   fieldset{border:0;padding:0;margin:0}
+  fieldset[hidden]{display:none}
   legend{font-weight:700;font-size:.95rem;margin-bottom:8px;padding:0}
   .msg{min-height:1.6em;margin:0;font-size:.9rem;color:var(--slate);text-align:center;line-height:1.7}
   .frame{border-radius:18px;overflow:hidden;box-shadow:0 10px 34px rgba(38,36,73,.18);border:1px solid #e6e6ee;background:#fff;aspect-ratio:9/16}
@@ -39,11 +40,19 @@
 <body>
 <main>
   <div class="strip" aria-hidden="true"></div>
-  <h1>دعوتك لمعرض ECONOVA جاهزة، بس ناقصها اسمك</h1>
-  <p class="lead">اكتب اسمك، نزّل الصورة، وشاركها في الستوري.</p>
+  <h1 id="h1">دعوتك لمعرض ECONOVA جاهزة، بس ناقصها اسمك</h1>
+  <p class="lead" id="lead">اكتب اسمك، نزّل الصورة، وشاركها في الستوري.</p>
 
   <fieldset>
-    <legend>الدعوة لـ</legend>
+    <legend>اللغة / Language</legend>
+    <div class="seg">
+      <input type="radio" name="lang" id="l-ar" value="ar" checked><label for="l-ar">عربي</label>
+      <input type="radio" name="lang" id="l-en" value="en"><label for="l-en">English</label>
+    </div>
+  </fieldset>
+
+  <fieldset id="genderSet">
+    <legend id="lg-g">الدعوة لـ</legend>
     <div class="seg">
       <input type="radio" name="g" id="g-m" value="m" checked><label for="g-m">ولد</label>
       <input type="radio" name="g" id="g-f" value="f"><label for="g-f">بنت</label>
@@ -51,7 +60,7 @@
   </fieldset>
 
   <div>
-    <label for="name">اسمك</label>
+    <label for="name" id="lb-name">اسمك</label>
     <input id="name" type="text" maxlength="40" placeholder="اكتب اسمك هنا" autocomplete="name" enterkeyhint="done">
   </div>
   <button id="save" disabled>تنزيل الدعوة كصورة</button>
@@ -67,6 +76,85 @@ const W = 1080, H = 1920, CX = W / 2;
 const C = { navy:"#262449", maroon:"#a10133", slate:"#4b4e6f", lav:"#9a9fcf" };
 const FONT = '"Alexandria","Segoe UI",Tahoma,sans-serif';
 
+/* ---- the two languages ---- */
+const T = {
+  ar: {
+    dir: "rtl", lang: "ar",
+    title: "دعوة ECONOVA — اكتب اسمك",
+    h1: "دعوتك لمعرض ECONOVA جاهزة، بس ناقصها اسمك",
+    lead: "اكتب اسمك، نزّل الصورة، وشاركها في الستوري.",
+    legendG: "الدعوة لـ",
+    nameLabel: "اسمك",
+    placeholder: "اكتب اسمك هنا",
+    button: "تنزيل الدعوة كصورة",
+    alt: "معاينة دعوة ECONOVA",
+    wait: "لحظة…",
+    saved: "تم الحفظ، شاركها في الستوري ونشوفك في المعرض.",
+    downloaded: "تم التنزيل، شاركها في الستوري ونشوفك في المعرض.",
+    longpress: "اضغط مطوّلاً على الصورة تحت واختر «حفظ الصورة».",
+    file: "econova-invite-ar.png",
+    pill: "دعوة", pillW: 170,
+    friend: f => f ? "صديقتنا" : "صديقنا",
+    ghost: "اسمك هنا",
+    event: "معرض اقتصاد الموارد الطبيعية",
+    big1: f => f ? "مو كل شيء ما دفعتي قيمته" : "مو كل شيء ما دفعت قيمته",
+    big2: "يعني ما له ثمن",
+    small: f => [
+      "وراء كل قرار حسبة، ووراء كل حسبة تكلفة",
+      f ? "يمكن ما تشوفيها، لكن غيرك يتحمّلها." : "يمكن ما تشوفها، لكن غيرك يتحمّلها.",
+      f ? "بنغيّر نظرتك للأشياء اللي تحسبيها بالمجان،" : "بنغيّر نظرتك للأشياء اللي تحسبها بالمجان،",
+      f ? "وبنخليك تكتشفي إن الفاتورة ما تنتهي عندك." : "وبنخليك تكتشف إن الفاتورة ما تنتهي عندك."
+    ],
+    cols: [
+      [880, 190, "الثلاثاء", "والأربعاء"],
+      [680, 190, "١٧ - ١٨", "نوفمبر"],
+      [480, 190, "٩ صباحاً", "٣ مساءً"],
+      [240, 270, "لوبي كلية العلوم", "الزراعية والبحرية"]
+    ],
+    rules: [780, 580, 380],
+    end1: "الحسبة ما وقفت عندك،",
+    end2: f => f ? "تعالي وشوفيها وين وصلت." : "تعال وشوفها وين وصلت."
+  },
+  en: {
+    dir: "ltr", lang: "en",
+    title: "ECONOVA Invitation — Add Your Name",
+    h1: "Your ECONOVA invitation is ready — it just needs your name",
+    lead: "Type your name, download the image, and share it to your story.",
+    legendG: "",
+    nameLabel: "Your name",
+    placeholder: "Type your name here",
+    button: "Download invitation as image",
+    alt: "ECONOVA invitation preview",
+    wait: "One moment…",
+    saved: "Saved — share it to your story and we'll see you at the exhibition.",
+    downloaded: "Downloaded — share it to your story and we'll see you at the exhibition.",
+    longpress: "Press and hold the image below, then choose “Save image”.",
+    file: "econova-invite-en.png",
+    pill: "INVITATION", pillW: 300,
+    friend: () => "Our friend",
+    ghost: "YOUR NAME",
+    event: "Natural Resource Economics Exhibition",
+    big1: () => "Just because you didn't pay for it",
+    big2: "doesn't mean it's free",
+    small: () => [
+      "Behind every decision is a calculation,",
+      "and behind every calculation, a cost.",
+      "You may not see it, but someone else bears it.",
+      "We'll change how you see what you call free."
+    ],
+    cols: [
+      [210, 220, "Tuesday", "& Wednesday"],
+      [420, 200, "17 - 18", "November"],
+      [610, 180, "9 AM", "3 PM"],
+      [840, 280, "Agricultural & Marine", "Sciences Lobby"]
+    ],
+    rules: [320, 520, 700],
+    end1: "The bill didn't stop with you.",
+    end2: () => "Come and see how far it went."
+  }
+};
+let L = T.ar;
+
 const canvas = document.createElement("canvas"); canvas.width = W; canvas.height = H;
 const ctx = canvas.getContext("2d");
 const $ = id => document.getElementById(id);
@@ -75,17 +163,17 @@ const bg = new Image();
 
 function text(str, x, y, size, weight, color, maxW, fam) {
   const F = fam ? `"${fam}",${FONT}` : FONT;
-  ctx.direction = "rtl"; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = color;
+  ctx.direction = L.dir; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = color;
   let s = size;
   ctx.font = `${weight} ${s}px ${F}`;
-  while (maxW && ctx.measureText(str).width > maxW && s > 20) { s -= 1; ctx.font = `${weight} ${s}px ${F}`; }
+  while (maxW && ctx.measureText(str).width > maxW && s > 18) { s -= 1; ctx.font = `${weight} ${s}px ${F}`; }
   ctx.fillText(str, x, y);
 }
 function pill(label, cx, cy, w, h) {
   ctx.fillStyle = C.maroon; ctx.beginPath();
   if (ctx.roundRect) ctx.roundRect(cx - w/2, cy - h/2, w, h, 12); else ctx.rect(cx - w/2, cy - h/2, w, h);
   ctx.fill();
-  ctx.textBaseline = "middle"; ctx.direction = "rtl"; ctx.textAlign = "center";
+  ctx.textBaseline = "middle"; ctx.direction = L.dir; ctx.textAlign = "center";
   ctx.fillStyle = "#fff"; ctx.font = `700 30px ${FONT}`; ctx.fillText(label, cx, cy + 2);
 }
 function rule(x1, y1, x2, y2) {
@@ -94,41 +182,34 @@ function rule(x1, y1, x2, y2) {
 
 function draw() {
   const name = nameEl.value.trim().replace(/\s+/g, " ");
-  const f = document.getElementById("g-f").checked;
+  const f = L === T.ar && document.getElementById("g-f").checked;
   const MAXW = 880;
   ctx.clearRect(0, 0, W, H);
   ctx.drawImage(bg, 0, 0, W, H);
 
   /* 1 — the invitation and who it is for */
-  pill("دعوة", CX, 400, 170, 58);
-  text(f ? "صديقتنا" : "صديقنا", CX, 484, 34, 500, C.maroon);
-  text(name || "اسمك هنا", CX, 592, 104, 400, name ? C.navy : C.lav, 900, "Lalezar");
+  pill(L.pill, CX, 400, L.pillW, 58);
+  text(L.friend(f), CX, 484, 34, 500, C.maroon);
+  text(name || L.ghost, CX, 592, 104, 400, name ? C.navy : C.lav, 900, "Lalezar");
 
   /* 2 — ECONOVA wordmark is in the background (y 670–935) */
-  text("معرض اقتصاد الموارد الطبيعية", CX, 992, 31, 700, C.navy, MAXW);
+  text(L.event, CX, 992, 31, 700, C.navy, MAXW);
 
   /* 3 — the message */
-  text(f ? "مو كل شيء ما دفعتي قيمته" : "مو كل شيء ما دفعت قيمته", CX, 1082, 46, 800, C.navy, MAXW);
-  text("يعني ما له ثمن", CX, 1146, 46, 800, C.maroon, MAXW);
-  text("وراء كل قرار حسبة، ووراء كل حسبة تكلفة", CX, 1212, 29, 400, C.slate, MAXW);
-  text(f ? "يمكن ما تشوفيها، لكن غيرك يتحمّلها." : "يمكن ما تشوفها، لكن غيرك يتحمّلها.", CX, 1256, 29, 400, C.slate, MAXW);
-  text(f ? "بنغيّر نظرتك للأشياء اللي تحسبيها بالمجان،" : "بنغيّر نظرتك للأشياء اللي تحسبها بالمجان،", CX, 1312, 29, 400, C.slate, MAXW);
-  text(f ? "وبنخليك تكتشفي إن الفاتورة ما تنتهي عندك." : "وبنخليك تكتشف إن الفاتورة ما تنتهي عندك.", CX, 1356, 29, 400, C.slate, MAXW);
+  text(L.big1(f), CX, 1082, 46, 800, C.navy, MAXW);
+  text(L.big2, CX, 1146, 46, 800, C.maroon, MAXW);
+  const lines = L.small(f);
+  const ys = [1212, 1256, 1312, 1356];
+  lines.forEach((s, i) => text(s, CX, ys[i], 29, 400, C.slate, MAXW));
 
   /* 4 — when and where, between two rules */
   rule(100, 1394, 980, 1394); rule(100, 1500, 980, 1500);
-  const cols = [
-    [880, 190, "الثلاثاء", "والأربعاء"],
-    [680, 190, "١٧ - ١٨", "نوفمبر"],
-    [480, 190, "٩ صباحاً", "٣ مساءً"],
-    [240, 270, "لوبي كلية العلوم", "الزراعية والبحرية"],
-  ];
-  for (const [x, w, a, b] of cols) { text(a, x, 1438, 28, 500, C.maroon, w - 20); text(b, x, 1480, 28, 500, C.maroon, w - 20); }
-  for (const x of [780, 580, 380]) rule(x, 1414, x, 1482);
+  for (const [x, w, a, b] of L.cols) { text(a, x, 1438, 28, 500, C.maroon, w - 20); text(b, x, 1480, 28, 500, C.maroon, w - 20); }
+  for (const x of L.rules) rule(x, 1414, x, 1482);
 
   /* 5 — closing line */
-  text("الحسبة ما وقفت عندك،", CX, 1562, 36, 800, C.navy, MAXW);
-  text(f ? "تعالي وشوفيها وين وصلت." : "تعال وشوفها وين وصلت.", CX, 1612, 36, 800, C.maroon, MAXW);
+  text(L.end1, CX, 1562, 36, 800, C.navy, MAXW);
+  text(L.end2(f), CX, 1612, 36, 800, C.maroon, MAXW);
 
   saveBtn.disabled = !name;
   canvas.toBlob(b => {
@@ -138,35 +219,53 @@ function draw() {
   }, "image/png");
 }
 
+function applyLang() {
+  L = document.getElementById("l-en").checked ? T.en : T.ar;
+  const h = document.documentElement;
+  h.lang = L.lang; h.dir = L.dir;
+  document.title = L.title;
+  $("h1").textContent = L.h1;
+  $("lead").textContent = L.lead;
+  $("lb-name").textContent = L.nameLabel;
+  nameEl.placeholder = L.placeholder;
+  saveBtn.textContent = L.button;
+  preview.alt = L.alt;
+  $("genderSet").hidden = L !== T.ar;
+  if (L === T.ar) $("lg-g").textContent = L.legendG;
+  msg.textContent = "";
+  draw();
+}
+
 document.querySelectorAll('input[name="g"]').forEach(r => r.addEventListener("change", draw));
+document.querySelectorAll('input[name="lang"]').forEach(r => r.addEventListener("change", applyLang));
 let t; nameEl.addEventListener("input", () => { clearTimeout(t); t = setTimeout(draw, 120); msg.textContent = ""; });
 nameEl.addEventListener("keydown", e => { if (e.key === "Enter") nameEl.blur(); });
 
-const LONGPRESS = "اضغط مطوّلاً على الصورة تحت واختر «حفظ الصورة».";
 saveBtn.addEventListener("click", async () => {
   draw();
   const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
-  if (!blob) { msg.textContent = LONGPRESS; return; }
-  const filename = "econova-invite.png";
+  if (!blob) { msg.textContent = L.longpress; return; }
+  const filename = L.file;
   if (window.claude && window.claude.use) {
-    msg.textContent = "لحظة…";
+    msg.textContent = L.wait;
     let dl = null; try { dl = await window.claude.use("downloads"); } catch (e) {}
-    if (!dl) { msg.textContent = LONGPRESS; return; }
-    try { await dl.save({ filename, data: blob }); msg.textContent = "تم الحفظ، شاركها في الستوري ونشوفك في المعرض."; }
-    catch (e) { msg.textContent = e && e.code === "declined" ? "" : LONGPRESS; }
+    if (!dl) { msg.textContent = L.longpress; return; }
+    try { await dl.save({ filename, data: blob }); msg.textContent = L.saved; }
+    catch (e) { msg.textContent = e && e.code === "declined" ? "" : L.longpress; }
   } else {
     try {
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename;
       document.body.appendChild(a); a.click(); a.remove();
-      msg.textContent = "تم التنزيل، شاركها في الستوري ونشوفك في المعرض.";
-    } catch (e) { msg.textContent = LONGPRESS; }
+      msg.textContent = L.downloaded;
+    } catch (e) { msg.textContent = L.longpress; }
   }
 });
 
 bg.onload = () => {
   draw();
   if (document.fonts && document.fonts.load) {
-    Promise.all([400, 500, 700, 800].map(w => document.fonts.load(`${w} 40px "Alexandria"`, "دعوة ECONOVA")).concat(document.fonts.load('400 40px "Lalezar"', "دعوة ECONOVA")))
+    const probe = "دعوة ECONOVA Name";
+    Promise.all([400, 500, 700, 800].map(w => document.fonts.load(`${w} 40px "Alexandria"`, probe)).concat(document.fonts.load('400 40px "Lalezar"', probe)))
       .then(draw).catch(() => {});
   }
 };
