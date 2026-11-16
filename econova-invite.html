@@ -82,7 +82,9 @@ function text(str, x, y, size, weight, color, maxW, fam) {
   ctx.fillText(str, x, y);
 }
 function pill(label, cx, cy, w, h) {
-  ctx.fillStyle = C.maroon; ctx.beginPath(); ctx.roundRect(cx - w/2, cy - h/2, w, h, 12); ctx.fill();
+  ctx.fillStyle = C.maroon; ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(cx - w/2, cy - h/2, w, h, 12); else ctx.rect(cx - w/2, cy - h/2, w, h);
+  ctx.fill();
   ctx.textBaseline = "middle"; ctx.direction = "rtl"; ctx.textAlign = "center";
   ctx.fillStyle = "#fff"; ctx.font = `700 30px ${FONT}`; ctx.fillText(label, cx, cy + 2);
 }
